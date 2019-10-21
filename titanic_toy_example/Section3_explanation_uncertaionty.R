@@ -3,7 +3,7 @@ library(iBreakDown)
 library(reticulate)
 library(ranger)
 
-titanic_train <- read.csv("D:\\Alicja\\micro_work\\UAI2019\\titanic_bd.csv")
+titanic_train <- read.csv("titanic_toy_example/titanic_bd.csv")
 head(titanic_train)
 
 titanic <- titanic_train[,-1]

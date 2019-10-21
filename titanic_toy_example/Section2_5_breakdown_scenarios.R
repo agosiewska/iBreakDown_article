@@ -4,7 +4,7 @@ library(reticulate)
 
 set.seed(123)
 
-titanic_train <- read.csv("titanic_bd.csv")
+titanic_train <- read.csv("titanic_toy_example/titanic_bd.csv")
 head(titanic_train)
 
 X_train <- titanic_train[,c(3:5)]
