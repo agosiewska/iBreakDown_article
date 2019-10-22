@@ -46,7 +46,7 @@ for(i in 1:nrow(tasks)){
   auc <- measureAUC(probs_gbm, dataset[test_id, target_var], positive = positive, negative = negative)
   filename <- paste0("./benchmark/models/task_", task_id, "_gbm.rda")
   auc_df <- rbind(auc_df, data.frame(task_id = task_id, model =  "gbm", auc =  auc))
-  save(model_ranger, file = filename)
+  save(model_gbm, file = filename)
   print(paste("gbm: ", auc))
   
 }
