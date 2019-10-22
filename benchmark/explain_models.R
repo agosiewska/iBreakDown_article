@@ -9,6 +9,26 @@ tasks = listOMLTasks(tag="openml100", number.of.missing.values = 0, number.of.cl
 
 # gbm does not currently handle categorical variables with more than 1024 levels. Variable 1: RESOURCE has 7085 levels.
 tasks <- tasks %>% filter(task.id != 34539)
+# 300 features
+tasks <- tasks %>% filter(task.id != 3485)
+# 971 features
+tasks <- tasks %>% filter(task.id != 3891)
+# 101 features
+tasks <- tasks %>% filter(task.id != 9970)
+# 501 features
+tasks <- tasks %>% filter(task.id != 9976)
+# 109 features
+tasks <- tasks %>% filter(task.id != 9977)
+# 1777 features
+tasks <- tasks %>% filter(task.id != 14966)
+
+
+
+# remove calculated tasks
+files <- list.files("./benchmark/explanations/")
+calculated_tasks <- gsub("task_","", files)
+calculated_tasks <- gsub("_gbm.rda","", calculated_tasks)
+tasks <- tasks %>% filter(!(task.id %in% calculated_tasks))
 
 # saving ranger and gbm models for all datasets
 for(i in 1:nrow(tasks)){
@@ -40,19 +60,19 @@ for(i in 1:nrow(tasks)){
   exp_gbm <- explain_mlr(model_gbm,
                             data = dataset,
                             y = y,
-                            label = paste("ranger_", task_id))
+                            label = paste("gbm_", task_id))
   ibd_ranger <- list()
   ibd_gbm <- list()
   for(j in 1:50){
     print(paste("Observation:", j))  
     new_observations <- dataset[test_id[j], ]  
-    ibd_ranger <- c(ibd_ranger, local_interactions(exp_ranger, new_observation = new_observations))
-    paste("ranger calculated")
-    ibd_gbm <- c(ibd_gbm, local_interactions(exp_gbm, new_observation = new_observations))
+    # ibd_ranger[[j]] <- local_interactions(exp_ranger, new_observation = new_observations)
+    # paste("ranger calculated")
+    ibd_gbm[[j]] <- local_interactions(exp_gbm, new_observation = new_observations)
     paste("gbm calculated")
   }
-  filename <- paste0("./benchmark/explanations/task_", task_id, "_ranger.rda")
-  save(ibd_ranger, file = filename)
+  # filename <- paste0("./benchmark/explanations/task_", task_id, "_ranger.rda")
+  # save(ibd_ranger, file = filename)
   filename <- paste0("./benchmark/explanations/task_", task_id, "_gbm.rda")
   save(ibd_gbm, file = filename)
 }
