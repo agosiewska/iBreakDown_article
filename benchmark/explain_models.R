@@ -4,6 +4,7 @@ library(ranger)
 library(DALEX)
 library(DALEXtra)
 library(iBreakDown)
+library(mlr)
 
 tasks = listOMLTasks(tag="openml100", number.of.missing.values = 0, number.of.classes = 2)
 
@@ -23,11 +24,10 @@ tasks <- tasks %>% filter(task.id != 9977)
 tasks <- tasks %>% filter(task.id != 14966)
 
 
-
 # remove calculated tasks
 files <- list.files("./benchmark/explanations/")
 calculated_tasks <- gsub("task_","", files)
-calculated_tasks <- gsub("_gbm.rda","", calculated_tasks)
+calculated_tasks <- gsub("_gbm_id3.rda","", calculated_tasks)
 tasks <- tasks %>% filter(!(task.id %in% calculated_tasks))
 
 # saving ranger and gbm models for all datasets
@@ -48,33 +48,53 @@ for(i in 1:nrow(tasks)){
   y <- as.numeric(dataset[,target_var] == positive)
   
   # load corresponding models
-  filename_ranger <- paste0("./benchmark/models/task_", task_id, "_ranger.rda")
-  load(filename_ranger)
-  exp_ranger <- explain_mlr(model_ranger,
-                            data = dataset,
-                            y = y,
-                            label = paste("ranger_", task_id))
+  # filename_ranger <- paste0("./benchmark/models/task_", task_id, "_ranger.rda")
+  # load(filename_ranger)
+  # exp_ranger <- explain_mlr(model_ranger,
+  #                           data = dataset,
+  #                           y = y,
+  #                           label = paste("ranger_", task_id))
+  # 
+  # filename_gbm <- paste0("./benchmark/models/task_", task_id, "_gbm.rda")
+  # load(filename_gbm)
+  # exp_gbm <- explain_mlr(model_gbm,
+  #                           data = dataset,
+  #                           y = y,
+  #                           label = paste("gbm_", task_id))
   
-  filename_gbm <- paste0("./benchmark/models/task_", task_id, "_gbm.rda")
-  load(filename_gbm)
-  exp_gbm <- explain_mlr(model_gbm,
-                            data = dataset,
-                            y = y,
-                            label = paste("gbm_", task_id))
+  # filename_gbm_id2 <- paste0("./benchmark/models/task_", task_id, "_gbm_id2.rda")
+  # load(filename_gbm_id2)
+  # exp_gbm_id2 <- explain_mlr(model_gbm_id2,
+  #                        data = dataset,
+  #                        y = y,
+  #                        label = paste("gbm_id2_", task_id))
+  
+  filename_gbm_id3 <- paste0("./benchmark/models/task_", task_id, "_gbm_id3.rda")
+  load(filename_gbm_id3)
+  exp_gbm_id3 <- explain_mlr(model_gbm_id3,
+                             data = dataset,
+                             y = y,
+                             label = paste("gbm_id3_", task_id))
+  
   ibd_ranger <- list()
   ibd_gbm <- list()
+  ibd_gbm_id3 <- list()
   for(j in 1:50){
     print(paste("Observation:", j))  
     new_observations <- dataset[test_id[j], ]  
     # ibd_ranger[[j]] <- local_interactions(exp_ranger, new_observation = new_observations)
-    # paste("ranger calculated")
-    ibd_gbm[[j]] <- local_interactions(exp_gbm, new_observation = new_observations)
-    paste("gbm calculated")
+    # ibd_gbm[[j]] <- local_interactions(exp_gbm, new_observation = new_observations)
+    # ibd_gbm_id2[[j]] <- local_interactions(exp_gbm_id2, new_observation = new_observations)
+    ibd_gbm_id3[[j]] <- local_interactions(exp_gbm_id3, new_observation = new_observations)
   }
   # filename <- paste0("./benchmark/explanations/task_", task_id, "_ranger.rda")
   # save(ibd_ranger, file = filename)
-  filename <- paste0("./benchmark/explanations/task_", task_id, "_gbm.rda")
-  save(ibd_gbm, file = filename)
+  # filename <- paste0("./benchmark/explanations/task_", task_id, "_gbm.rda")
+  # save(ibd_gbm, file = filename)
+  # filename <- paste0("./benchmark/explanations/task_", task_id, "_gbm_id2.rda")
+  # save(ibd_gbm_id2, file = filename)
+  filename <- paste0("./benchmark/explanations/task_", task_id, "_gbm_id3.rda")
+  save(ibd_gbm_id3, file = filename)
 }
 
 

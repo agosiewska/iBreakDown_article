@@ -27,28 +27,49 @@ for(i in 1:nrow(tasks)){
   positive = getTaskDesc(task_train)$positive
   negative = getTaskDesc(task_train)$negative
   
-  # ranger part
-  learner_ranger <- makeLearner("classif.ranger", predict.type = "prob")
-  model_ranger <- train(learner_ranger, task_train)
-  pred_ranger <- predict(model_ranger, newdata = dataset[test_id, ], type = "probability")
-  probs_ranger <- getPredictionProbabilities(pred_ranger)
-  auc <- measureAUC(probs_ranger, dataset[test_id, target_var], positive = positive, negative = negative)
-  filename <- paste0("./benchmark/models/task_", task_id, "_ranger.rda")
-  auc_df <- rbind(auc_df, data.frame(task_id = task_id, model = "ranger", auc = auc))
-  save(model_ranger, file = filename)
-  print(paste("ranger: ", auc))
+  # # ranger part
+  # learner_ranger <- makeLearner("classif.ranger", predict.type = "prob")
+  # model_ranger <- train(learner_ranger, task_train)
+  # pred_ranger <- predict(model_ranger, newdata = dataset[test_id, ], type = "probability")
+  # probs_ranger <- getPredictionProbabilities(pred_ranger)
+  # auc <- measureAUC(probs_ranger, dataset[test_id, target_var], positive = positive, negative = negative)
+  # filename <- paste0("./benchmark/models/task_", task_id, "_ranger.rda")
+  # auc_df <- rbind(auc_df, data.frame(task_id = task_id, model = "ranger", auc = auc))
+  # save(model_ranger, file = filename)
+  # print(paste("ranger: ", auc))
+
+  # # gbm part
+  # learner_gbm <- makeLearner("classif.gbm", predict.type = "prob")
+  # model_gbm <- train(learner_gbm, task_train)
+  # pred_gbm <- predict(model_gbm, newdata = dataset[test_id, ], type = "probability")
+  # probs_gbm <- getPredictionProbabilities(pred_gbm)
+  # auc <- measureAUC(probs_gbm, dataset[test_id, target_var], positive = positive, negative = negative)
+  # filename <- paste0("./benchmark/models/task_", task_id, "_gbm.rda")
+  # auc_df <- rbind(auc_df, data.frame(task_id = task_id, model =  "gbm", auc =  auc))
+  # save(model_gbm, file = filename)
+  # print(paste("gbm: ", auc))
+
+  # # gbm with interaction depth part
+  # learner_gbm_id2 <- makeLearner("classif.gbm", predict.type = "prob", par.vals = list(interaction.depth = 2))
+  # model_gbm_id2 <- train(learner_gbm_id2, task_train)
+  # pred_gbm_id2 <- predict(model_gbm_id2, newdata = dataset[test_id, ], type = "probability")
+  # probs_gbm_id2 <- getPredictionProbabilities(pred_gbm_id2)
+  # auc <- measureAUC(probs_gbm_id2, dataset[test_id, target_var], positive = positive, negative = negative)
+  # filename <- paste0("./benchmark/models/task_", task_id, "_gbm_id2.rda")
+  # auc_df <- rbind(auc_df, data.frame(task_id = task_id, model =  "gbm_id2", auc =  auc))
+  # save(model_gbm_id2, file = filename)
+  # print(paste("gbm_id2: ", auc))
   
-  # gbm part  
-  learner_gbm <- makeLearner("classif.gbm", predict.type = "prob")
-  model_gbm <- train(learner_gbm, task_train)
-  pred_gbm <- predict(model_gbm, newdata = dataset[test_id, ], type = "probability")
-  probs_gbm <- getPredictionProbabilities(pred_gbm)
-  auc <- measureAUC(probs_gbm, dataset[test_id, target_var], positive = positive, negative = negative)
-  filename <- paste0("./benchmark/models/task_", task_id, "_gbm.rda")
-  auc_df <- rbind(auc_df, data.frame(task_id = task_id, model =  "gbm", auc =  auc))
-  save(model_gbm, file = filename)
-  print(paste("gbm: ", auc))
-  
+  # gbm with 3 interaction depth   
+  learner_gbm_id3 <- makeLearner("classif.gbm", predict.type = "prob", par.vals = list(interaction.depth = 3))
+  model_gbm_id3 <- train(learner_gbm_id3, task_train)
+  pred_gbm_id3 <- predict(model_gbm_id3, newdata = dataset[test_id, ], type = "probability")
+  probs_gbm_id3 <- getPredictionProbabilities(pred_gbm_id3)
+  auc <- measureAUC(probs_gbm_id3, dataset[test_id, target_var], positive = positive, negative = negative)
+  filename <- paste0("./benchmark/models/task_", task_id, "_gbm_id3.rda")
+  auc_df <- rbind(auc_df, data.frame(task_id = task_id, model =  "gbm_id3", auc =  auc))
+  save(model_gbm_id3, file = filename)
+  print(paste("gbm_id3: ", auc))
 }
 
 write.csv(auc_df, file = "./benchmark/auc_results.csv")
