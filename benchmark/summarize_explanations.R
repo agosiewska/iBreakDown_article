@@ -1,4 +1,6 @@
 library(ggplot2)
+library(dplyr)
+
 files <- list.files("./benchmark/explanations/")
 
 results <- data.frame(task=character(), model=character(), observation=numeric(), interactions = numeric())
@@ -6,6 +8,8 @@ results <- data.frame(task=character(), model=character(), observation=numeric()
 for(file in files){
   load(paste0("./benchmark/explanations/", file))
   for(i in 1:50){
+    task <- file
+    if(grepl("ranger.rda", task)) model <- "ranger"
     if(grepl("gbm.rda", task)) model <- "gbm"
     if(grepl("gbm_id2.rda", task)) model <- "gbm_id2"
     if(grepl("gbm_id3.rda", task)) model <- "gbm_id3"
@@ -32,7 +36,15 @@ results %>%
   select(interactions)%>%
   table()
 
-table(results$interactions)
+results %>%
+  filter(model =="gbm_id3") %>%
+  select(interactions)%>%
+  table()
 
+results %>%
+  filter(model =="ranger") %>%
+  select(interactions)%>%
+  table()
 
-
+table(results$model, results$interactions) %>%
+  xtable::xtable()
