@@ -25,26 +25,75 @@ for(file in files){
 
 
 write.csv(results, "benchmark/interactions_results.csv")
+results <- read.csv("benchmark/interactions_results.csv")
+
 
 results %>%
   filter(model =="gbm") %>%
   select(interactions)%>%
   table()
+# 
+# results %>%
+#   filter(model =="gbm_id2") %>%
+#   select(interactions)%>%
+#   table()
+# 
+# results %>%
+#   filter(model =="gbm_id3") %>%
+#   select(interactions)%>%
+#   table()
+# 
+# results %>%
+#   filter(model =="ranger") %>%
+#   select(interactions)%>%
+#   table()
+# 
+# table(results$model, results$interactions) %>%
+#   xtable::xtable()
 
-results %>%
-  filter(model =="gbm_id2") %>%
-  select(interactions)%>%
-  table()
+####################
+# Summarize by task
+results2 <- results
+results2$interactions <- ifelse(results2$interactions >=5, "5+", results2$interactions)
 
-results %>%
-  filter(model =="gbm_id3") %>%
-  select(interactions)%>%
-  table()
+interaction_table <- data.frame("task" = character(),
+                                "model" = character(),
+                                "0"=numeric(), 
+                                "1"=numeric(), 
+                                "2"=numeric(), 
+                                "3"=numeric(), 
+                                "4"=numeric(),
+                                "5+"=numeric())
 
-results %>%
-  filter(model =="ranger") %>%
-  select(interactions)%>%
-  table()
+tasks <- results$task %>% unique()
+models <- results$model %>% unique()
 
-table(results$model, results$interactions) %>%
-  xtable::xtable()
+for(mdl in models){
+  for(tsk in tasks){
+    results_template <- c("task"=tsk, "model" = mdl, "0"=0, "1"=0, "2"=0, "3"=0, "4"=0, "5+"=0)
+    tmp <- results2 %>%
+      filter(model == mdl & task == tsk) 
+    results_template[names(table(tmp$interactions))] <- table(tmp$interactions) 
+    print(results_template)
+    interaction_table <- rbind(interaction_table, as.data.frame(t(results_template)))
+  }
+}
+  
+
+model_name = "ranger"
+it <-interaction_table %>%
+  arrange(as.numeric(as.character(task))) %>%
+  filter(model == model_name) 
+
+rownames(it) <- it$task
+xtable::xtable(it[,-c(1,2)], caption = model_name, label = paste0("fig:benchmark_", model_name))
+
+
+
+
+results %>% filter(model == "ranger") %>%
+filter(interactions >= 1) %>%
+pull(task)  %>%
+unique()
+
+
