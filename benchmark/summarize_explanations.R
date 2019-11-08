@@ -54,7 +54,7 @@ results %>%
 ####################
 # Summarize by task
 results2 <- results
-results2$interactions <- ifelse(results2$interactions >=5, "5+", results2$interactions)
+results2$interactions <- ifelse(results2$interactions >=4, "4+", results2$interactions)
 
 interaction_table <- data.frame("task" = character(),
                                 "model" = character(),
@@ -62,15 +62,14 @@ interaction_table <- data.frame("task" = character(),
                                 "1"=numeric(), 
                                 "2"=numeric(), 
                                 "3"=numeric(), 
-                                "4"=numeric(),
-                                "5+"=numeric())
+                                "4+"=numeric())
 
 tasks <- results$task %>% unique()
 models <- results$model %>% unique()
 
 for(mdl in models){
   for(tsk in tasks){
-    results_template <- c("task"=tsk, "model" = mdl, "0"=0, "1"=0, "2"=0, "3"=0, "4"=0, "5+"=0)
+    results_template <- c("task"=tsk, "model" = mdl, "0"=0, "1"=0, "2"=0, "3"=0, "4+"=0)
     tmp <- results2 %>%
       filter(model == mdl & task == tsk) 
     results_template[names(table(tmp$interactions))] <- table(tmp$interactions) 
@@ -80,20 +79,28 @@ for(mdl in models){
 }
   
 
-model_name = "ranger"
-it <-interaction_table %>%
+it_ranger <-interaction_table %>%
   arrange(as.numeric(as.character(task))) %>%
-  filter(model == model_name) 
+  filter(model == "ranger") 
+it_gbm_id1 <-interaction_table %>%
+  arrange(as.numeric(as.character(task))) %>%
+  filter(model == "gbm") 
 
-rownames(it) <- it$task
-xtable::xtable(it[,-c(1,2)], caption = model_name, label = paste0("fig:benchmark_", model_name))
+table1 <- cbind(it_ranger[,-c(1,2)], it_gbm_id1[,-c(1,2)])
 
-
-
-
-results %>% filter(model == "ranger") %>%
-filter(interactions >= 1) %>%
-pull(task)  %>%
-unique()
+rownames(table1) <- it_gbm$task
+xtable::xtable(table1, caption = model_name, label = paste0("fig:benchmark_", model_name))
 
 
+
+it_gbm_id2 <-interaction_table %>%
+  arrange(as.numeric(as.character(task))) %>%
+  filter(model == "gbm_id2") 
+it_gbm_id3 <-interaction_table %>%
+  arrange(as.numeric(as.character(task))) %>%
+  filter(model == "gbm_id3") 
+
+table2 <- cbind(it_gbm_id2[,-c(1,2)], it_gbm_id3[,-c(1,2)])
+
+rownames(table2) <- it_gbm$task
+xtable::xtable(table2, caption = model_name, label = paste0("fig:benchmark_", model_name))

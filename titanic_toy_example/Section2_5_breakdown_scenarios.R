@@ -10,7 +10,7 @@ head(titanic_train)
 X_train <- titanic_train[,c(3:5)]
 Y_train <- titanic_train$Survived
 
-rf <- py_load_object("rf_classifier.pkl", pickle = "pickle")
+rf <- py_load_object("./titanic_toy_example/rf_classifier.pkl", pickle = "pickle")
 
 predict_function <- function(model, newdata){
   model$predict_proba(newdata)[,2]
@@ -46,7 +46,7 @@ p13 <- plot(exp_3)
 library(patchwork)
 library(ggplot2)
 
-(p11 + ggtitle("Scenario 1") )/( p12 + ggtitle("Scenario 2")) # 
+(p11 + p12)
 
 p13 + ggtitle("Scenario 3")
 
