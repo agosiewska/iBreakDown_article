@@ -88,8 +88,8 @@ it_gbm_id1 <-interaction_table %>%
 
 table1 <- cbind(it_ranger[,-c(1,2)], it_gbm_id1[,-c(1,2)])
 
-rownames(table1) <- it_gbm$task
-xtable::xtable(table1, caption = model_name, label = paste0("fig:benchmark_", model_name))
+rownames(table1) <- it_gbm_id1$task
+xtable::xtable(table1)
 
 
 
