@@ -1,5 +1,6 @@
 library(ggplot2)
 library(dplyr)
+library(OpenML)
 
 files <- list.files("./benchmark/explanations/")
 
@@ -79,6 +80,15 @@ for(mdl in models){
 }
   
 
+# add tasks datasets
+tasks_oml100 <- listOMLTasks(tag="openml100", number.of.classes = 2, number.of.missing.values = 0)
+tasks_oml100[["task.id"]] <- as.factor(tasks_oml100[["task.id"]])
+interaction_table <- interaction_table %>%
+  left_join(tasks_oml100[,c("task.id", "name")], by = c("task"="task.id"))
+interaction_table[["task_name"]]  <- paste0(interaction_table[["task"]], " (", interaction_table[["name"]], ")")
+interaction_table <- interaction_table %>%
+  select(-name)
+
 it_ranger <-interaction_table %>%
   arrange(as.numeric(as.character(task))) %>%
   filter(model == "ranger") 
@@ -88,7 +98,9 @@ it_gbm_id1 <-interaction_table %>%
 
 table1 <- cbind(it_ranger[,-c(1,2)], it_gbm_id1[,-c(1,2)])
 
-rownames(table1) <- it_gbm_id1$task
+rownames(table1) <- it_gbm_id1$task_name
+colnames(table1)
+table1 <- table1[, -c(6, 12)]
 xtable::xtable(table1)
 
 
@@ -102,5 +114,6 @@ it_gbm_id3 <-interaction_table %>%
 
 table2 <- cbind(it_gbm_id2[,-c(1,2)], it_gbm_id3[,-c(1,2)])
 
-rownames(table2) <- it_gbm$task
-xtable::xtable(table2, caption = model_name, label = paste0("fig:benchmark_", model_name))
+rownames(table2) <- it_gbm_id2$task_name
+table2 <- table2[, -c(6, 12)]
+xtable::xtable(table2)
