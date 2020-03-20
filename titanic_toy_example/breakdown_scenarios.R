@@ -1,4 +1,4 @@
-library(DALEX2)
+library(DALEX)
 library(iBreakDown)
 library(reticulate)
 
@@ -13,9 +13,9 @@ Y_train <- titanic_train$Survived
 rf <- py_load_object("./titanic_toy_example/rf_classifier.pkl", pickle = "pickle")
 
 predict_function <- function(model, newdata){
-  model$predict_proba(newdata)[,2]
+  model$predict_proba(as.matrix(newdata))[,2]
 }
-predict_function(rf, X_train[274, ])
+predict_function(rf,  X_train[274, ])
 
 
 # iBreakDown
@@ -39,7 +39,7 @@ p11 <- plot(exp_1)
 p12 <- plot(exp_2)
 
 
-(exp_3 <- local_interactions(rf_explain3, X_train[274,]))
+(exp_3 <- local_interactions(rf_explain3, X_train[274,], order = c("Sex", "Age:Pclass")))
 p13 <- plot(exp_3)
 
 
@@ -50,5 +50,5 @@ library(ggplot2)
 
 p13 + ggtitle("Scenario 3")
 
-
+save(p13, file = "bd_sc3.rda")
 

@@ -25,7 +25,7 @@ for(file in files){
 }
 
 
-write.csv(results, "benchmark/interactions_results.csv")
+# write.csv(results, "benchmark/interactions_results.csv")
 results <- read.csv("benchmark/interactions_results.csv")
 
 
@@ -117,3 +117,18 @@ table2 <- cbind(it_gbm_id2[,-c(1,2)], it_gbm_id3[,-c(1,2)])
 rownames(table2) <- it_gbm_id2$task_name
 table2 <- table2[, -c(6, 12)]
 xtable::xtable(table2)
+
+
+
+# Sum of interactions
+n_interactions <- sum(sapply(table1[,-1], function(x) as.numeric(as.character(x)))) + sum(sapply(table2[,-1], function(x) as.numeric(as.character(x)))) 
+n_explanations <- sum(sapply(table1, function(x) as.numeric(as.character(x)))) + sum(sapply(table2, function(x) as.numeric(as.character(x)))) 
+n_interactions / n_explanations
+  
+  
+  
+  
+  
+  
+  
+  
