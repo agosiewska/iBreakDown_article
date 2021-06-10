@@ -39,7 +39,7 @@ i_gbm[,"label"] <- "GBM 1"
 i_gbm_id2[,"label"] <- "GBM 2"
 i_gbm_id3[,"label"] <- "GBM 3"
 i_gbm_id4[,"label"] <- "GBM 4"
-
+i_ranger[,"label"] <- "random forest"
 
 plot(i_gbm) +
   plot(i_gbm_id2) + 
